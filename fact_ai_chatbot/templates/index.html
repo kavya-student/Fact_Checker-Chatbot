@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Fact Chatbot</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #1e1e2f;
+            color: white;
+        }
+
+        .chat-container {
+            width: 50%;
+            margin: 50px auto;
+            background: #2c2c3e;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .user, .bot {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+        }
+
+        .user {
+            background: #667eea;
+            text-align: right;
+        }
+
+        .bot {
+            background: #444;
+        }
+
+        input {
+            width: 75%;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>🧠 Fact Checker Chatbot</h2>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <input type="text" id="message" placeholder="Enter a statement...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+function sendMessage() {
+    let input = document.getElementById("message");
+    let message = input.value;
+
+    if (!message) return;
+
+    let chatBox = document.getElementById("chat-box");
+
+    // show user message
+    chatBox.innerHTML += `<div class="user">${message}</div>`;
+
+    // typing effect
+    chatBox.innerHTML += `<div class="bot" id="typing">Typing...</div>`;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("typing").remove();
+        chatBox.innerHTML += `<div class="bot">${data.reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    input.value = "";
+}
+
+// Enter key support
+document.getElementById("message").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
